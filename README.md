@@ -10,7 +10,6 @@ This repository contains **hands-on projects** showcasing my skills in **C++**, 
 
 ## Purpose
 - Strengthen practical experience
-- Prepare for interviews at fintech & product companies
 - Demonstrate C++ + Python + Cloud expertise
 
 ## How to Use
