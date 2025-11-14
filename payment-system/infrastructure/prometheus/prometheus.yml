@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'payment-system'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:8000']
+    metrics_path: '/metrics'
+
+  - job_name: 'user-service'
+    static_configs:
+      - targets: ['user-service:8001']
+    metrics_path: '/metrics'
+
+  - job_name: 'wallet-service'
+    static_configs:
+      - targets: ['wallet-service:8002']
+    metrics_path: '/metrics'
+
+  - job_name: 'transaction-service'
+    static_configs:
+      - targets: ['transaction-service:8003']
+    metrics_path: '/metrics'
+
+  - job_name: 'payment-gateway'
+    static_configs:
+      - targets: ['payment-gateway:8004']
+    metrics_path: '/metrics'
