@@ -1,0 +1,35 @@
+# HFT System Configuration
+
+# Logging
+log_file=logs/hft_system.log
+
+# Symbol Configuration
+symbol=AAPL
+
+# Exchange Connection
+exchange_host=localhost
+exchange_port=9001
+
+# Strategy Selection (market_making or stat_arb)
+strategy=market_making
+
+# Market Making Strategy Parameters
+spread_bps=10.0
+quote_size=100
+quote_refresh_ms=100
+
+# Statistical Arbitrage Strategy Parameters
+lookback_period=100
+entry_threshold=2.0
+exit_threshold=0.5
+
+# Risk Management
+max_position=1000
+max_order_size=500
+max_loss=10000.0
+price_collar=5.0
+max_orders_per_sec=100
+
+# Performance
+enable_cpu_pinning=false
+cpu_core=0
