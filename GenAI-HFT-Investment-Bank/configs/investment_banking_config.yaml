@@ -1,0 +1,395 @@
+# Investment Banking Configuration File
+# Portfolio Management, Credit Risk, and Advisory Settings
+
+# Portfolio Optimization
+portfolio:
+  # Optimization method
+  method: "mean_variance"  # mean_variance, risk_parity, minimum_variance, maximum_sharpe, black_litterman
+
+  # Objective
+  objective: "sharpe_ratio"  # sharpe_ratio, return, risk, utility
+
+  # Constraints
+  constraints:
+    max_position_size: 0.20  # Max 20% in any asset
+    min_position_size: 0.00
+    max_sector_exposure: 0.40  # Max 40% in any sector
+    allow_short_selling: false
+    leverage_limit: 1.0  # No leverage
+
+  # Asset universe
+  universe:
+    equities:
+      - AAPL
+      - GOOGL
+      - MSFT
+      - AMZN
+      - TSLA
+      - JPM
+      - BAC
+      - GS
+      - XOM
+      - CVX
+    fixed_income:
+      - TLT  # Long-term Treasury
+      - IEF  # Medium-term Treasury
+      - AGG  # Aggregate Bond
+      - HYG  # High Yield
+    alternatives:
+      - GLD  # Gold
+      - VNQ  # Real Estate
+      - DBC  # Commodities
+    international:
+      - EFA  # Developed Markets
+      - EEM  # Emerging Markets
+
+  # Rebalancing
+  rebalancing:
+    frequency: "monthly"  # daily, weekly, monthly, quarterly
+    threshold: 0.05  # Rebalance if drift > 5%
+    transaction_cost_bps: 10  # 10 basis points
+
+  # Risk parameters
+  risk:
+    target_volatility: 0.15  # 15% annual volatility
+    max_drawdown: 0.20  # 20% max drawdown
+    var_confidence: 0.95  # 95% VaR
+    cvar_confidence: 0.95  # 95% CVaR
+
+# Credit Risk Assessment
+credit_risk:
+  # Model configuration
+  model:
+    type: "deep_learning"  # deep_learning, traditional, ensemble
+    model_path: "models/credit_risk_model.pth"
+
+  # Data sources
+  data_sources:
+    financial_statements: true
+    market_data: true
+    news_sentiment: true
+    industry_data: true
+    macroeconomic: true
+
+  # Rating thresholds (credit score 0-1000)
+  rating_thresholds:
+    AAA: 900
+    AA: 800
+    A: 700
+    BBB: 600
+    BB: 500
+    B: 400
+    CCC: 300
+    CC: 200
+    C: 100
+
+  # Analysis parameters
+  analysis:
+    lookback_years: 5
+    forecast_horizon_years: 1
+    stress_scenarios:
+      - name: "base_case"
+        probability: 0.70
+      - name: "recession"
+        probability: 0.20
+      - name: "severe_recession"
+        probability: 0.10
+
+  # Industry-specific LGD (Loss Given Default)
+  lgd_by_industry:
+    banking: 0.45
+    real_estate: 0.30
+    utilities: 0.35
+    technology: 0.60
+    retail: 0.55
+    manufacturing: 0.40
+    energy: 0.35
+    healthcare: 0.40
+
+# Deal Analysis & M&A
+deal_analysis:
+  # Valuation methods
+  valuation_methods:
+    - "dcf"  # Discounted Cash Flow
+    - "comparable_companies"
+    - "precedent_transactions"
+    - "asset_based"
+
+  # DCF parameters
+  dcf:
+    forecast_years: 5
+    terminal_growth_rate: 0.025  # 2.5%
+    wacc_range: [0.08, 0.12]  # 8-12%
+    probability_weighted: true
+
+  # Synergies
+  synergies:
+    revenue_synergies: 0.05  # 5% revenue uplift
+    cost_synergies: 0.10  # 10% cost reduction
+    realization_period_years: 3
+
+  # Risk adjustments
+  risk_adjustments:
+    integration_risk: 0.15
+    execution_risk: 0.10
+    market_risk: 0.10
+
+# LLM Configuration
+llm:
+  # Primary LLM
+  primary:
+    provider: "anthropic"  # anthropic, openai, local
+    model: "claude-3-opus-20240229"
+    temperature: 0.3
+    max_tokens: 4096
+
+  # Backup LLM
+  backup:
+    provider: "openai"
+    model: "gpt-4"
+    temperature: 0.3
+    max_tokens: 4096
+
+  # Use cases
+  use_cases:
+    - "earnings_call_analysis"
+    - "financial_document_processing"
+    - "market_research"
+    - "investment_thesis_generation"
+    - "regulatory_compliance"
+    - "client_communication"
+
+  # RAG (Retrieval-Augmented Generation)
+  rag:
+    enabled: true
+    chunk_size: 1000
+    overlap: 200
+    embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+    vector_store: "faiss"
+    top_k: 5
+
+# Research & Analytics
+research:
+  # Data sources
+  data_sources:
+    market_data:
+      - provider: "bloomberg"
+        priority: 1
+      - provider: "refinitiv"
+        priority: 2
+    fundamental_data:
+      - provider: "factset"
+        priority: 1
+    alternative_data:
+      - "satellite_imagery"
+      - "web_traffic"
+      - "social_media_sentiment"
+      - "credit_card_transactions"
+
+  # Analysis frequency
+  analysis_frequency:
+    daily:
+      - "market_summary"
+      - "news_analysis"
+      - "portfolio_performance"
+    weekly:
+      - "sector_rotation"
+      - "factor_analysis"
+      - "risk_report"
+    monthly:
+      - "comprehensive_review"
+      - "strategy_adjustment"
+      - "client_reporting"
+
+  # Report generation
+  reports:
+    auto_generate: true
+    templates:
+      - "investment_recommendation"
+      - "market_outlook"
+      - "portfolio_review"
+      - "risk_analysis"
+    distribution:
+      - "email"
+      - "portal"
+      - "api"
+
+# Client Advisory
+client_advisory:
+  # Client segmentation
+  segments:
+    - name: "ultra_high_net_worth"
+      min_aum: 50000000
+      service_level: "premium"
+    - name: "high_net_worth"
+      min_aum: 1000000
+      service_level: "standard"
+    - name: "mass_affluent"
+      min_aum: 100000
+      service_level: "basic"
+
+  # Risk profiling
+  risk_profiles:
+    - name: "conservative"
+      max_equity: 0.30
+      target_return: 0.05
+    - name: "moderate"
+      max_equity: 0.60
+      target_return: 0.08
+    - name: "aggressive"
+      max_equity: 0.90
+      target_return: 0.12
+
+  # Personalization
+  personalization:
+    enabled: true
+    factors:
+      - "age"
+      - "investment_horizon"
+      - "risk_tolerance"
+      - "tax_situation"
+      - "investment_objectives"
+      - "liquidity_needs"
+
+# Compliance & Regulations
+compliance:
+  # Regulatory frameworks
+  frameworks:
+    - "SEC"  # Securities and Exchange Commission
+    - "FINRA"  # Financial Industry Regulatory Authority
+    - "MiFID_II"  # Markets in Financial Instruments Directive
+    - "GDPR"  # General Data Protection Regulation
+
+  # Checks
+  checks:
+    pre_trade:
+      - "suitability"
+      - "best_execution"
+      - "concentration_limits"
+    post_trade:
+      - "trade_reporting"
+      - "record_keeping"
+      - "client_disclosure"
+
+  # Documentation
+  documentation:
+    retention_years: 7
+    audit_trail: true
+    encryption: "AES-256"
+
+# Performance Tracking
+performance:
+  # Benchmarks
+  benchmarks:
+    equity: "SPY"  # S&P 500
+    fixed_income: "AGG"  # Aggregate Bond
+    balanced: "60/40"  # 60% equity, 40% bonds
+
+  # Metrics
+  metrics:
+    - "total_return"
+    - "annualized_return"
+    - "sharpe_ratio"
+    - "sortino_ratio"
+    - "max_drawdown"
+    - "volatility"
+    - "alpha"
+    - "beta"
+    - "information_ratio"
+    - "tracking_error"
+
+  # Attribution analysis
+  attribution:
+    enabled: true
+    factors:
+      - "asset_allocation"
+      - "security_selection"
+      - "currency"
+      - "sector"
+      - "style"
+
+# Monitoring & Alerts
+monitoring:
+  # Real-time monitoring
+  real_time:
+    enabled: true
+    refresh_interval_seconds: 60
+
+  # Alerts
+  alerts:
+    channels:
+      - "email"
+      - "sms"
+      - "slack"
+      - "dashboard"
+
+    conditions:
+      - metric: "portfolio_drawdown"
+        threshold: 0.10
+        severity: "high"
+      - metric: "position_drift"
+        threshold: 0.05
+        severity: "medium"
+      - metric: "var_breach"
+        threshold: 1.0
+        severity: "critical"
+
+  # Logging
+  logging:
+    level: "INFO"
+    file: "logs/investment_banking.log"
+    max_size_mb: 500
+    backup_count: 30
+
+# Machine Learning
+machine_learning:
+  # Model retraining
+  retraining:
+    frequency: "weekly"
+    min_samples: 1000
+    validation_split: 0.2
+
+  # Feature engineering
+  features:
+    technical:
+      enabled: true
+      lookback_days: 252
+    fundamental:
+      enabled: true
+      ratios:
+        - "pe_ratio"
+        - "pb_ratio"
+        - "debt_to_equity"
+        - "roe"
+        - "roa"
+    sentiment:
+      enabled: true
+      sources:
+        - "news"
+        - "social_media"
+        - "analyst_reports"
+
+  # Model evaluation
+  evaluation:
+    metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "auc_roc"
+    minimum_performance:
+      accuracy: 0.70
+      precision: 0.65
+
+# Backtesting
+backtest:
+  enabled: true
+  start_date: "2020-01-01"
+  end_date: "2023-12-31"
+  initial_capital: 10000000
+  rebalancing_cost_bps: 10
+
+  # Output
+  results_path: "results/backtest/"
+  generate_report: true
+  include_attribution: true

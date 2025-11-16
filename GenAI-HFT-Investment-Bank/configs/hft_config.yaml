@@ -1,0 +1,187 @@
+# HFT Configuration File
+# High-Frequency Trading System Settings
+
+# Model Configuration
+model:
+  type: "transformer"  # transformer, lstm, gru
+  quantization: true  # Use INT8 quantization for speed
+  device: "cuda"  # cuda or cpu
+  model_path: "models/hft_transformer.pth"
+
+  # Model Architecture
+  architecture:
+    input_dim: 128
+    hidden_dim: 512
+    num_heads: 8
+    num_layers: 6
+    dropout: 0.1
+    sequence_length: 100
+
+# Latency Configuration
+latency:
+  target_us: 100  # Target latency in microseconds
+  max_acceptable_us: 200  # Maximum acceptable latency
+  warning_threshold_us: 150  # Warn if latency exceeds this
+
+  # Optimization flags
+  optimizations:
+    gpu_inference: true
+    batch_processing: false  # Disable for lowest latency
+    feature_caching: true
+    jit_compilation: true
+
+# Trading Configuration
+trading:
+  # Symbols to trade
+  symbols:
+    - AAPL
+    - GOOGL
+    - MSFT
+    - AMZN
+    - TSLA
+
+  # Trading hours (UTC)
+  trading_hours:
+    start: "09:30:00"
+    end: "16:00:00"
+    timezone: "America/New_York"
+
+  # Order configuration
+  orders:
+    default_order_type: "LIMIT"  # LIMIT, MARKET, IOC, FOK
+    time_in_force: "IOC"  # IOC, GTC, DAY
+    min_order_size: 100
+    max_order_size: 10000
+    order_size_increment: 100
+
+# Risk Management
+risk:
+  # Position limits
+  max_position_per_symbol: 10000
+  max_total_position: 50000
+  max_notional: 1000000
+
+  # Loss limits
+  max_daily_loss: 50000
+  max_position_loss: 10000
+  stop_loss_percentage: 0.02
+
+  # Concentration limits
+  max_concentration: 0.2  # Max 20% in any symbol
+
+  # Circuit breakers
+  circuit_breakers:
+    enabled: true
+    loss_threshold: 25000  # Halt if loss exceeds this
+    max_trades_per_second: 100
+    cooldown_period_seconds: 300
+
+# Feature Engineering
+features:
+  # Order book features
+  order_book:
+    depth_levels: 10
+    calculate_microprice: true
+    calculate_imbalance: true
+    calculate_flow_toxicity: true
+
+  # Technical indicators
+  technical:
+    - name: "sma"
+      periods: [10, 50, 200]
+    - name: "ema"
+      periods: [12, 26]
+    - name: "rsi"
+      period: 14
+    - name: "macd"
+      fast: 12
+      slow: 26
+      signal: 9
+    - name: "bollinger_bands"
+      period: 20
+      std: 2
+
+  # Volume features
+  volume:
+    vwap_window: 20
+    volume_ma_window: 50
+
+# Data Sources
+data:
+  # Market data
+  market_data:
+    primary: "exchange_feed"  # exchange_feed, vendor_api
+    backup: "vendor_api"
+    cache_size: 100000
+
+  # News data
+  news:
+    enabled: true
+    sources:
+      - "bloomberg"
+      - "reuters"
+    sentiment_threshold: 0.3
+
+# Monitoring
+monitoring:
+  # Metrics to track
+  metrics:
+    - latency
+    - fill_rate
+    - pnl
+    - sharpe_ratio
+    - win_rate
+    - slippage
+
+  # Logging
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    file: "logs/hft.log"
+    max_size_mb: 100
+    backup_count: 10
+
+  # Alerts
+  alerts:
+    enabled: true
+    channels:
+      - "email"
+      - "slack"
+    conditions:
+      - metric: "latency"
+        threshold: 200
+        operator: ">"
+      - metric: "daily_loss"
+        threshold: 25000
+        operator: ">"
+
+# Performance Tuning
+performance:
+  # Threading
+  num_worker_threads: 4
+  pin_threads_to_cores: true
+
+  # Memory
+  preallocate_buffers: true
+  buffer_size: 1000000
+
+  # Network
+  use_kernel_bypass: true
+  tcp_nodelay: true
+
+  # CPU
+  cpu_affinity: [0, 1, 2, 3]  # Pin to specific cores
+  use_huge_pages: true
+
+# Backtesting
+backtest:
+  enabled: true
+  start_date: "2023-01-01"
+  end_date: "2023-12-31"
+  initial_capital: 1000000
+  transaction_cost_bps: 5  # 5 basis points
+  slippage_model: "linear"
+
+  # Output
+  results_path: "results/backtest/"
+  generate_report: true
+  plot_results: true
