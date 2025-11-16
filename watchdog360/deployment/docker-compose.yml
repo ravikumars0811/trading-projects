@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with TimescaleDB
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: watchdog360-db
+    environment:
+      POSTGRES_DB: watchdog360
+      POSTGRES_USER: watchdog360
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchdog360"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - watchdog360
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: watchdog360-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - watchdog360
+
+  # Backend API
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: watchdog360-backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://watchdog360:${DB_PASSWORD:-changeme}@timescaledb:5432/watchdog360
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-this}
+      ALLOWED_ORIGINS: http://localhost:3000,https://dashboard.watchdog360.com
+      DEBUG: ${DEBUG:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../backend:/app
+    networks:
+      - watchdog360
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: watchdog360-frontend
+    environment:
+      VITE_API_URL: ${API_URL:-http://localhost:8000/api/v1}
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - watchdog360
+    restart: unless-stopped
+
+  # Nginx (optional - for production)
+  nginx:
+    image: nginx:alpine
+    container_name: watchdog360-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - watchdog360
+    restart: unless-stopped
+
+volumes:
+  timescale_data:
+  redis_data:
+
+networks:
+  watchdog360:
+    driver: bridge
