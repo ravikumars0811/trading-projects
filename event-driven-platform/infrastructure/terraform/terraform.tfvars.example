@@ -1,0 +1,19 @@
+# AWS Configuration
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Project
+project_name = "event-driven-platform"
+
+# Database credentials (DO NOT commit actual credentials)
+db_username = "admin"
+db_password = "CHANGE_ME_IN_PRODUCTION"
+
+mongodb_username = "admin"
+mongodb_password = "CHANGE_ME_IN_PRODUCTION"
+
+# Instance sizes (adjust based on environment)
+db_instance_class    = "db.t3.micro"    # Use db.t3.medium or larger for production
+redis_node_type      = "cache.t3.micro"  # Use cache.t3.medium or larger for production
+kafka_instance_type  = "kafka.t3.small"  # Use kafka.m5.large or larger for production
+kafka_broker_nodes   = 3                 # 3 for HA in production
