@@ -1,0 +1,110 @@
+// gRPC Service Definition for Financial LLM
+// Optimized for ultra-low latency HFT applications
+
+syntax = "proto3";
+
+package financial_llm;
+
+// Financial LLM Service
+service FinancialLLM {
+  // Classify text for sentiment/market regime (ultra-low latency)
+  rpc Classify (ClassifyRequest) returns (ClassifyResponse);
+
+  // Batch classification
+  rpc BatchClassify (BatchClassifyRequest) returns (BatchClassifyResponse);
+
+  // Generate text from prompt
+  rpc Generate (GenerateRequest) returns (GenerateResponse);
+
+  // Stream generation (for longer outputs)
+  rpc StreamGenerate (GenerateRequest) returns (stream GenerateStreamResponse);
+
+  // Market analysis
+  rpc AnalyzeMarket (MarketAnalysisRequest) returns (MarketAnalysisResponse);
+
+  // Get model stats
+  rpc GetStats (StatsRequest) returns (StatsResponse);
+
+  // Health check
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+// Messages
+
+message ClassifyRequest {
+  string text = 1;
+  bool return_probabilities = 2;
+}
+
+message ClassifyResponse {
+  map<string, float> sentiment = 1;
+  float latency_ms = 2;
+  string timestamp = 3;
+}
+
+message BatchClassifyRequest {
+  repeated string texts = 1;
+}
+
+message BatchClassifyResponse {
+  repeated ClassifyResponse results = 1;
+  float total_latency_ms = 2;
+  float throughput = 3;
+}
+
+message GenerateRequest {
+  string prompt = 1;
+  int32 max_new_tokens = 2;
+  float temperature = 3;
+  int32 top_k = 4;
+  float top_p = 5;
+}
+
+message GenerateResponse {
+  string text = 1;
+  int32 num_tokens = 2;
+  float latency_ms = 3;
+  float tokens_per_second = 4;
+  string timestamp = 5;
+}
+
+message GenerateStreamResponse {
+  string token = 1;
+  bool is_final = 2;
+}
+
+message MarketAnalysisRequest {
+  string ticker = 1;
+  string data_json = 2;
+  string analysis_type = 3;
+}
+
+message MarketAnalysisResponse {
+  string ticker = 1;
+  string analysis_json = 2;
+  string recommendation = 3;
+  float confidence = 4;
+  float latency_ms = 5;
+}
+
+message StatsRequest {
+  bool reset = 1;
+}
+
+message StatsResponse {
+  int32 total_requests = 1;
+  float avg_latency_ms = 2;
+  float p50_latency_ms = 3;
+  float p95_latency_ms = 4;
+  float p99_latency_ms = 5;
+  float p999_latency_ms = 6;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;
+  string version = 2;
+  bool model_loaded = 3;
+  float uptime_seconds = 4;
+}
