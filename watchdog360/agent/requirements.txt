@@ -1,0 +1,6 @@
+# System monitoring
+psutil==5.9.6
+
+# HTTP client
+requests==2.31.0
+urllib3==2.1.0
