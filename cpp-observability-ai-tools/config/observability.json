@@ -1,0 +1,59 @@
+{
+  "logging": {
+    "level": "info",
+    "file": "observability.log",
+    "console_enabled": true,
+    "json_format": false,
+    "max_recent_logs": 1000
+  },
+  "mcp_server": {
+    "enabled": true,
+    "port": 8080,
+    "max_connections": 100
+  },
+  "health_monitoring": {
+    "enabled": true,
+    "default_interval_seconds": 30,
+    "background_monitoring": true
+  },
+  "metrics": {
+    "max_metrics": 10000,
+    "export_interval_seconds": 60,
+    "prometheus_export": true
+  },
+  "tracing": {
+    "enabled": true,
+    "max_spans": 10000,
+    "sampling_rate": 1.0,
+    "jaeger_export": true
+  },
+  "alerting": {
+    "enabled": true,
+    "evaluation_interval_seconds": 60,
+    "max_active_alerts": 100,
+    "max_alert_history": 1000
+  },
+  "ai": {
+    "enabled": true,
+    "provider": "openai",
+    "model": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 2000,
+    "timeout_seconds": 30
+  },
+  "automation": {
+    "enabled": true,
+    "max_concurrent_workflows": 10,
+    "max_tasks_per_workflow": 50
+  },
+  "analytics": {
+    "dashboard_refresh_seconds": 30,
+    "dashboard_file": "dashboard.html",
+    "chart_width": 80,
+    "chart_height": 20
+  },
+  "async_execution": {
+    "thread_pool_size": 0,
+    "max_queue_size": 1000
+  }
+}
