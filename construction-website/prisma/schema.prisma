@@ -1,0 +1,314 @@
+// Prisma schema for Construction Company Website
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication (Admin and Clients)
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          UserRole  @default(CLIENT)
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  clientProjects ClientProject[]
+  supportRequests SupportRequest[]
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+// Service model
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  pricePerSqFt Decimal @db.Decimal(10, 2)
+  image       String?
+  features    Json     // Array of features
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  projects    Project[]
+}
+
+// Construction Package model
+model Package {
+  id          String   @id @default(cuid())
+  name        String   // Basic, Standard, Premium, Luxury
+  description String   @db.Text
+  pricePerSqFt Decimal @db.Decimal(10, 2)
+  materials   Json     // Detailed material list
+  features    Json     // Array of features
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Project model
+model Project {
+  id            String        @id @default(cuid())
+  title         String
+  slug          String        @unique
+  description   String        @db.Text
+  location      String
+  area          Decimal       @db.Decimal(10, 2)
+  status        ProjectStatus @default(UPCOMING)
+  progress      Int           @default(0) // 0-100%
+  startDate     DateTime?
+  completionDate DateTime?
+  estimatedCost Decimal?      @db.Decimal(12, 2)
+  serviceId     String
+  images        Json          // Array of image URLs
+  videos        Json?         // Array of video URLs
+  floorPlans    Json?         // Array of floor plan URLs
+  featured      Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  service       Service       @relation(fields: [serviceId], references: [id])
+  testimonials  Testimonial[]
+  clientProjects ClientProject[]
+}
+
+enum ProjectStatus {
+  COMPLETED
+  ONGOING
+  UPCOMING
+}
+
+// Testimonial model
+model Testimonial {
+  id          String   @id @default(cuid())
+  clientName  String
+  clientImage String?
+  rating      Int      // 1-5
+  review      String   @db.Text
+  videoUrl    String?
+  projectId   String?
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  project     Project? @relation(fields: [projectId], references: [id])
+}
+
+// Enquiry/Lead model
+model Enquiry {
+  id          String      @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  enquiryType EnquiryType
+  message     String      @db.Text
+  siteSize    Decimal?    @db.Decimal(10, 2)
+  location    String?
+  budget      Decimal?    @db.Decimal(12, 2)
+  status      LeadStatus  @default(NEW)
+  source      String?     // Form source
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum EnquiryType {
+  GENERAL
+  CALLBACK
+  SITE_VISIT
+  QUOTATION
+  COST_ESTIMATE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  CLOSED
+}
+
+// Blog/Article model
+model Blog {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  content     String       @db.Text
+  excerpt     String
+  coverImage  String?
+  author      String
+  category    BlogCategory
+  tags        Json         // Array of tags
+  published   Boolean      @default(false)
+  views       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum BlogCategory {
+  CONSTRUCTION_TIPS
+  DESIGN_IDEAS
+  MATERIAL_GUIDE
+  COST_ESTIMATION
+  LEGAL_COMPLIANCE
+  MAINTENANCE
+}
+
+// Client Project (for customer portal)
+model ClientProject {
+  id              String   @id @default(cuid())
+  userId          String
+  projectId       String
+  customProjectName String?
+  siteLocation    String
+  siteArea        Decimal  @db.Decimal(10, 2)
+  packageType     String   // Basic, Standard, Premium, Luxury
+  totalCost       Decimal  @db.Decimal(12, 2)
+  paidAmount      Decimal  @db.Decimal(12, 2) @default(0)
+  dueAmount       Decimal  @db.Decimal(12, 2)
+  progress        Int      @default(0) // 0-100%
+  status          String   @default("In Progress")
+  startDate       DateTime
+  expectedCompletion DateTime
+  documents       Json?    // Array of document URLs
+  invoices        Json?    // Array of invoice URLs
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id])
+  project         Project  @relation(fields: [projectId], references: [id])
+}
+
+// Support Request model (for customer portal)
+model SupportRequest {
+  id          String        @id @default(cuid())
+  userId      String
+  subject     String
+  description String        @db.Text
+  status      SupportStatus @default(OPEN)
+  priority    Priority      @default(MEDIUM)
+  response    String?       @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  user        User          @relation(fields: [userId], references: [id])
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+// Gallery model
+model Gallery {
+  id          String       @id @default(cuid())
+  title       String
+  type        MediaType
+  url         String
+  thumbnail   String?
+  category    GalleryCategory
+  description String?
+  projectRef  String?      // Reference to project
+  featured    Boolean      @default(false)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DRONE_VIDEO
+  WALKTHROUGH
+}
+
+enum GalleryCategory {
+  INTERIOR
+  EXTERIOR
+  VILLA
+  RENTAL_BUILDING
+  CONSTRUCTION_PROGRESS
+  COMPLETED_PROJECT
+}
+
+// Document model (for downloads)
+model Document {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  type        DocumentType
+  fileUrl     String
+  fileSize    String?
+  downloads   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum DocumentType {
+  BROCHURE
+  PRICING_SHEET
+  FLOOR_PLAN
+  MATERIAL_LIST
+  SAMPLE_AGREEMENT
+  SPECIFICATION
+}
+
+// Site Settings model
+model SiteSettings {
+  id                String   @id @default(cuid())
+  companyName       String
+  companyEmail      String
+  companyPhone      String
+  companyAddress    String
+  whatsappNumber    String
+  googleMapsUrl     String?
+  workingHours      String
+  facebookUrl       String?
+  instagramUrl      String?
+  youtubeUrl        String?
+  linkedinUrl       String?
+  googleAnalyticsId String?
+  facebookPixelId   String?
+  recaptchaSiteKey  String?
+  recaptchaSecretKey String?
+  smtpHost          String?
+  smtpPort          Int?
+  smtpUser          String?
+  smtpPassword      String?
+  updatedAt         DateTime @updatedAt
+}
+
+// Calculator Pricing Config
+model CalculatorConfig {
+  id                String   @id @default(cuid())
+  locationFactor    Json     // Location-based pricing factors
+  materialPackages  Json     // Package pricing details
+  laborCosts        Json     // Labor cost breakdown
+  additionalCosts   Json     // Other costs (permits, etc.)
+  updatedAt         DateTime @updatedAt
+}
